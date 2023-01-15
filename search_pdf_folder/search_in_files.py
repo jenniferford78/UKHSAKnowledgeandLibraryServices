@@ -16,6 +16,7 @@
 # Documentation at https://docs.python.org/3/library/re.html#
 # https://regex101.com/ is a handy tester
 
+# All inline comments provided by https://chat.openai.com/chat (ChatGPT)
 
 import pandas as pd
 import pdfplumber
@@ -31,17 +32,46 @@ search_flags = re.IGNORECASE
 # term, file, index of context, page, context
 
 def extract_pages(working_folder, filename):
+    """
+    Extracts the text from all pages of a PDF file.
+
+    Parameters:
+    working_folder (str): The path to the folder containing the PDF file.
+    filename (str): The name of the PDF file.
+
+    Returns:
+    extracted_text (list): A list of strings, where each string is the text from a page in the PDF file.
+    """
     with pdfplumber.open(os.path.join(working_folder, filename)) as pdf:
         extracted_text = [page.extract_text() for page in pdf.pages]
     return extracted_text
 
 def clean_page(page_string):
+    """
+    Cleans the text from a page to aid in text matching.
+
+    Parameters:
+    page_string (str): The text from a page of a PDF file.
+
+    Returns:
+    cleaned_string (str): The cleaned text from the page.
+    """
     # Appropriate steps to aid in text matching, e.g.
     # Replacing line breaks with whitespace
     cleaned_string = re.sub(r'\n', ' ', page_string, count = 0)
     return cleaned_string
 
 def process_file(filename):
+    """
+    Processes a PDF file by extracting text, cleaning the text, searching for specified terms, and outputting the results to a CSV file.
+
+    Parameters:
+    filename (str): The name of the PDF file to be processed.
+
+    Returns:
+    result_dataframes (list): A list of dataframes containing the results of the search for each term in the file.
+    """
+
     extracted_text = extract_pages(working_folder, filename)
     cleaned_pages = [clean_page(page) for page in extracted_text]
     page_sizes = [len(page) + 1 for page in cleaned_pages]
