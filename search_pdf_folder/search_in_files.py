@@ -80,7 +80,7 @@ from tkinter import Tk     # from tkinter import Tk for Python 3.x
 from tkinter.filedialog import askdirectory, asksaveasfile
 Tk().withdraw() # we don't want a full GUI, so keep the root window from appearing
 
-working_folder = askdirectory(mustexist=True)
+working_folder = askdirectory(title = "Select directory with PDF files", mustexist=True)
 
 with open(os.path.join(working_folder, terms_filename), 'r') as terms_file:
     terms = terms_file.read().split('\n')
@@ -90,6 +90,6 @@ pdf_filenames = [entry.name for entry in files if entry.is_file() and entry.name
 processed_file_dataframes = [process_file(filename) for filename in pdf_filenames]
 full_dataframe = pd.concat(processed_file_dataframes)
 
-output_file = asksaveasfile(defaultextension=".csv", filetypes=(("comma separated values", "*.csv"),("All Files", "*.*") ))
+output_file = asksaveasfile(title = "Save output csv", defaultextension=".csv", filetypes=(("comma separated values", "*.csv"),("All Files", "*.*") ))
 full_dataframe.to_csv(output_file)
 output_file.close()
