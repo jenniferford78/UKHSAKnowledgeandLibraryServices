@@ -51,7 +51,7 @@ def process_file(filename):
 
     def get_page(position):
         page = min([page_range[0] for page_range in page_ranges if position >= page_range[1][0] and position < page_range[1][1]])
-        return page
+        return page + 1
 
     def get_context(span):
         start = max(span[0] - spacing_around_context, 0)
@@ -66,6 +66,7 @@ def process_file(filename):
             'filename': [filename for match in matches],
             'term': [term for match in matches],
             'matched_term': [match.group(0) for match in matches],
+            'occurence_of_term': [i + 1 for i, match in enumerate(matches)],
             'page': pages,
             'context': contexts
         })
