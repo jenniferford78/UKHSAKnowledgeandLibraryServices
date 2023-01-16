@@ -44,7 +44,11 @@ def extract_pages(working_folder, filename):
     """
     with pdfplumber.open(os.path.join(working_folder, filename)) as pdf:
         extracted_text = [page.extract_text() for page in pdf.pages]
-    return extracted_text
+        try:
+            title = pdf.metadata['Title']
+        except:
+            title = 'No title metadata field'
+    return extracted_text, title
 
 def clean_page(page_string):
     """
@@ -72,7 +76,7 @@ def process_file(filename):
     result_dataframes (list): A list of dataframes containing the results of the search for each term in the file.
     """
 
-    extracted_text = extract_pages(working_folder, filename)
+    extracted_text, title = extract_pages(working_folder, filename)
     cleaned_pages = [clean_page(page) for page in extracted_text]
     page_sizes = [len(page) + 1 for page in cleaned_pages]
     cumulative_page_sizes = list(accumulate(page_sizes))
@@ -94,6 +98,7 @@ def process_file(filename):
         contexts = [get_context(match.span(0)) for match in matches]
         return pd.DataFrame(data = {
             'filename': [filename for match in matches],
+            'title': [title for match in matches],
             'term': [term for match in matches],
             'matched_term': [match.group(0) for match in matches],
             'occurence_of_term': [i + 1 for i, match in enumerate(matches)],
