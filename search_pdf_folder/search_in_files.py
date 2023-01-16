@@ -22,7 +22,8 @@ import pandas as pd
 import pdfplumber
 import os
 import re
-from itertools import accumulate
+from itertools import accumulate, islice
+from tqdm import tqdm #for progress bar
 
 spacing_around_context = 150 #characters
 terms_filename = 'terms.txt'
@@ -65,7 +66,7 @@ def clean_page(page_string):
     cleaned_string = re.sub(r'\n', ' ', page_string, count = 0)
     return cleaned_string
 
-def process_file(filename):
+def process_file(filename, results_per_file_and_term):
     """
     Processes a PDF file by extracting text, cleaning the text, searching for specified terms, and outputting the results to a CSV file.
 
@@ -93,7 +94,10 @@ def process_file(filename):
         return concatenated_pages[start:end]
 
     def search_for_term(term):
-        matches = list(re.finditer(term, concatenated_pages, flags = search_flags))
+        if results_per_file_and_term > 0:
+            matches = list(islice(re.finditer(term, concatenated_pages, flags = search_flags), results_per_file_and_term))
+        else: 
+            matches = list(re.finditer(term, concatenated_pages, flags = search_flags))
         pages = [get_page(match.start(0)) for match in matches]
         contexts = [get_context(match.span(0)) for match in matches]
         return pd.DataFrame(data = {
@@ -114,6 +118,8 @@ def process_file(filename):
 
 from tkinter import Tk     # from tkinter import Tk for Python 3.x
 from tkinter.filedialog import askdirectory, asksaveasfile
+from tkinter.simpledialog import askinteger
+
 Tk().withdraw() # we don't want a full GUI, so keep the root window from appearing
 
 working_folder = askdirectory(title = "Select directory with PDF files", mustexist=True)
@@ -121,9 +127,11 @@ working_folder = askdirectory(title = "Select directory with PDF files", mustexi
 with open(os.path.join(working_folder, terms_filename), 'r') as terms_file:
     terms = terms_file.read().split('\n')
 
+results_per_file_and_term = askinteger(title = "Results to return", prompt = "Number of results to return, 0 returns all", initialvalue = 0)
+
 files = list(os.scandir(working_folder))
 pdf_filenames = [entry.name for entry in files if entry.is_file() and entry.name.endswith('.pdf')]
-processed_file_dataframes = [process_file(filename) for filename in pdf_filenames]
+processed_file_dataframes = [process_file(filename, results_per_file_and_term) for filename in tqdm(pdf_filenames)]
 full_dataframe = pd.concat(processed_file_dataframes)
 
 output_file = asksaveasfile(title = "Save output csv", defaultextension=".csv", filetypes=(("comma separated values", "*.csv"),("All Files", "*.*") ))
