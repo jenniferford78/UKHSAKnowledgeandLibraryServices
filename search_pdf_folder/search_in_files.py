@@ -24,7 +24,7 @@ import os
 import re
 from itertools import accumulate
 
-spacing_around_context = 50 #characters
+spacing_around_context = 150 #characters
 terms_filename = 'terms.txt'
 search_flags = re.IGNORECASE
 
@@ -122,5 +122,5 @@ processed_file_dataframes = [process_file(filename) for filename in pdf_filename
 full_dataframe = pd.concat(processed_file_dataframes)
 
 output_file = asksaveasfile(title = "Save output csv", defaultextension=".csv", filetypes=(("comma separated values", "*.csv"),("All Files", "*.*") ))
-full_dataframe.to_csv(output_file)
+full_dataframe.to_csv(output_file, lineterminator = '\n')
 output_file.close()
