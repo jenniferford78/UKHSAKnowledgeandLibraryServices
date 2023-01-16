@@ -1,5 +1,6 @@
 Usage:
-Install the pdfplumber Python package (https://github.com/jsvine/pdfplumber) by running 'pip install pdfplumber' at the command line
+Install the pdfplumber Python package (https://github.com/jsvine/pdfplumber) by running 'pip install pdfplumber' or 'py -m pip install pdfplumber' at the command line
+Install the pandas Python package the same way ('py -m pip install pandas')
 Put a terms.txt file in the target folder with the desired search terms
 Run the search_in_files.py file 
 Prompts to browse for target folder
