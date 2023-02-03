@@ -348,5 +348,8 @@ FieldCondition('"air condi?ioning* and mushrooms"').export('EBSCO')
 Phrase('37 weeks').export('EBSCO')
 Phrase('"37 weeks"').export('EBSCO')
 FieldSearchCondition('"air condi?ioning* and mushrooms"').export('EBSCO')
+Phrase('bacon and eggs').export('EBSCO')
+Phrase('"bacon and eggs"').export('EBSCO')
+Phrase('"bacon sandwich" and "poached eggs"').export('EBSCO')
 
 """
