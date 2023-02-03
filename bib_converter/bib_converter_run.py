@@ -54,8 +54,8 @@ mandatories = {'EBSCO': '?', 'Cochrane': '?', #Warning for Cochrane
                 'WoS': '?', 'Scopus': '?', 'Proquest': '?' }
 
 
-operator_regex = r'\s(and|or|adj\d+)\s'
-
+operator_regex = r'[^"]*(?:[^"]*["][^"]*["][^"]*)*\s(and|or|adj\d+)\s' #Operator must be preceded by an even number of quotes
+# Use re.match instead of re.search to force starting at the start of the string
 
 
 # Class hierarchy (bottom up)
@@ -65,6 +65,10 @@ class StringCondition:
         self.input_string = input_string
         self.parsed_string = re.sub(f'\?', '<OPTIONAL>', self.input_string)
         self.parsed_string = re.sub(f'#', '<MANDATORY>', self.parsed_string)
+        if self.input_string[0] == '"':
+            self.quoted = True
+        else:
+            self.quoted = False
     def export(self, to_database):
         global warnings
         if to_database == 'PubMed' and re.findall(f'<', self.parsed_string):
@@ -77,7 +81,7 @@ class StringCondition:
             if to_database == 'Cochrane' and re.findall(f'<MANDATORY>', temp_for_export):
                 warnings = warnings.append('Mandatory wildcard converted to optional as unsupported in Cochrane for string ' + self.input_string)
             temp_for_export = re.sub(f'<MANDATORY>', mandatories[to_database], temp_for_export)
-        if re.findall(f' ', temp_for_export):
+        if re.findall(f' ', temp_for_export) and not self.quoted:
             temp_for_export = '"' + temp_for_export + '"'
         return temp_for_export
 
@@ -115,14 +119,19 @@ class FieldCondition:
     def __init__(self, input_string, from_database = 'Ovid'):
         stripped_input = input_string.strip()
         def FindPairedBracket(string):
+            # Ignore brackets in quotes
             depthCounter = 0
+            quoted = False
             for n, i in enumerate(string):
-                if i == '(':
-                    depthCounter = depthCounter + 1
-                elif i == ')':
-                    depthCounter = depthCounter - 1
-                    if depthCounter == 0:
-                        return n
+                if i == '"':
+                    quoted = not quoted
+                if not quoted: 
+                    if i == '(':
+                        depthCounter = depthCounter + 1
+                    elif i == ')':
+                        depthCounter = depthCounter - 1
+                        if depthCounter == 0:
+                            return n
             return None
         if stripped_input[0] == '(':
             matching_bracket_location = FindPairedBracket(stripped_input)
@@ -135,17 +144,17 @@ class FieldCondition:
                 left_string = stripped_input[:matching_bracket_location + 1]
                 remaining_string = stripped_input[matching_bracket_location + 1:]
                 self.type = 'operatorcombinedinput'
-                operator_location = re.search(operator_regex, remaining_string)
-                right_string = remaining_string[operator_location.end():]
-                operator_string = remaining_string[operator_location.start():operator_location.end()].strip()
+                operator_location = re.match(operator_regex, remaining_string)
+                right_string = remaining_string[operator_location.end(1):]
+                operator_string = remaining_string[operator_location.start(1):operator_location.end(1)].strip()
                 self.condition = OperatorCombinedFieldCondition(left_string, operator_string, right_string)
         else:
-            if re.search(operator_regex, stripped_input):
+            if re.match(operator_regex, stripped_input):
                 self.type = 'operatorcombinedinput'
-                operator_location = re.search(operator_regex, stripped_input)
-                left_string = stripped_input[:operator_location.start()]
-                operator_string = stripped_input[operator_location.start():operator_location.end()].strip()
-                right_string = stripped_input[operator_location.end():]
+                operator_location = re.match(operator_regex, stripped_input)
+                left_string = stripped_input[:operator_location.start(1)]
+                operator_string = stripped_input[operator_location.start(1):operator_location.end(1)].strip()
+                right_string = stripped_input[operator_location.end(1):]
                 self.condition = OperatorCombinedFieldCondition(left_string, operator_string, right_string)
             else:
                 self.type = 'stringcondition'
@@ -162,12 +171,21 @@ class FieldCondition:
 class FieldSearchCondition:
     def __init__(self, input_string, from_database = 'Ovid'):
         if from_database == 'Ovid':
-            field_list_string = re.findall(r'\.[\w,]+\.?$', input_string)[0]
-            field_string = input_string[:-len(field_list_string)]
-            self.field_list = field_list_string.strip('.').split(',')
-            self.field_condition = FieldCondition(field_string)
+            field_list = re.findall(r'\.[\w,]+\.?$', input_string)
+            if field_list:
+                field_list_string = field_list[0]
+                self.has_field_list = True
+                field_string = input_string[:-len(field_list_string)]
+                self.field_list = field_list_string.strip('.').split(',')
+                self.field_condition = FieldCondition(field_string)
+            else:
+                self.has_field_list = False
+                self.field_condition = FieldCondition(input_string)
     def export(self, to_database):
         global warnings
+        if not self.has_field_list:
+            exported_field_condition = self.field_condition.export(to_database)
+            return exported_field_condition
         def map_field_item(field_item, to_database):
             try:
                 to_field = field_mappings_from_ovid[field_item][to_database]
@@ -324,6 +342,11 @@ FieldCondition('air condi?ioning* adj4 mushrooms').export('EBSCO')
 FieldCondition('(bacon or sausages) adj3 mushrooms').export('WoS')
 Phrase('1 and 2').export('Proquest')
 Phrase(r'or/5-20').export('Proquest')
-Phrase('bacon and eggs.tw,ti').export('EBSCO')
+Phrase('bacon and eggs.tw,ti').export('EBSCO') #Error because fields not defined for EBSCO
+Phrase('bacon and eggs.tw,ti').export('WoS')
+FieldCondition('"air condi?ioning* and mushrooms"').export('EBSCO')
+Phrase('37 weeks').export('EBSCO')
+Phrase('"37 weeks"').export('EBSCO')
+FieldSearchCondition('"air condi?ioning* and mushrooms"').export('EBSCO')
 
 """
