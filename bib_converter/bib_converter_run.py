@@ -19,6 +19,7 @@ import re
 
 field_mappings_from_ovid = {'tw': {'WoS':'TS', 'Cochrane':'ti,ab', 'Scopus': 'TITLE-ABS', 'Proquest': 'ABSTRACT,TITLE', 'PubMed': 'tiab'},
 'ti': {'WoS': 'TI', 'Scopus': 'TITLE', 'Proquest': 'TITLE', 'PubMed': 'ti'},
+'m.titl': {'WoS': 'TI', 'Scopus': 'TITLE', 'Proquest': 'TITLE', 'PubMed': 'ti'},
 'ab': {'Scopus': 'ABS', 'Proquest': 'ABSTRACT', 'PubMed': 'ab'},
 'kf': {'WoS': 'KP', 'Scopus': 'KEY', 'Proquest': 'IF', 'PubMed': 'ot'},
 'kw': {'WoS': 'KP', 'Scopus': 'KEY', 'Proquest': 'IF', 'PubMed': 'ot'} 
