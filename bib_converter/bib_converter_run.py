@@ -20,7 +20,7 @@ import re
 field_mappings_from_ovid = {'tw': {'WoS':'TS', 'Cochrane':'ti,ab', 'Scopus': 'TITLE-ABS', 'Proquest': 'ABSTRACT,TITLE', 'PubMed': 'tiab'},
 'mp': {'WoS': 'TS', 'Cochrane':'ti,ab,kw', 'Scopus': 'TITLE-ABS-KEY', 'Proquest': 'SUMMARY'},
 'ti': {'WoS': 'TI', 'Cochrane':'ti', 'Scopus': 'TITLE', 'Proquest': 'TITLE', 'PubMed': 'ti', 'EBSCO': 'TI'},
-'m.titl': {'WoS': 'TI', 'Cochrane':'ti', 'Scopus': 'TITLE', 'Proquest': 'TITLE', 'PubMed': 'ti', 'EBSCO': 'TI'},
+'m_titl': {'WoS': 'TI', 'Cochrane':'ti', 'Scopus': 'TITLE', 'Proquest': 'TITLE', 'PubMed': 'ti', 'EBSCO': 'TI'},
 'ab': {'WoS': 'AB', 'Scopus': 'ABS', 'Cochrane':'ab', 'Proquest': 'ABSTRACT', 'PubMed': 'ab', 'EBSCO': 'AB'},
 'kf': {'WoS': 'KP', 'Scopus': 'KEY', 'Cochrane':'kw', 'Proquest': 'IF', 'PubMed': 'ot', 'EBSCO': 'SU'},
 'kw': {'WoS': 'KP', 'Scopus': 'KEY', 'Cochrane':'kw', 'Proquest': 'IF', 'PubMed': 'ot', 'EBSCO': 'SU'}}
