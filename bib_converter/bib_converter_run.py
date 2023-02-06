@@ -18,12 +18,11 @@ import re
 # User customisable parameters
 
 field_mappings_from_ovid = {'tw': {'WoS':'TS', 'Cochrane':'ti,ab', 'Scopus': 'TITLE-ABS', 'Proquest': 'ABSTRACT,TITLE', 'PubMed': 'tiab'},
-'ti': {'WoS': 'TI', 'Scopus': 'TITLE', 'Proquest': 'TITLE', 'PubMed': 'ti', 'EBSCO': 'TI'},
-'m.titl': {'WoS': 'TI', 'Scopus': 'TITLE', 'Proquest': 'TITLE', 'PubMed': 'ti', 'EBSCO': 'TI'},
-'ab': {'Scopus': 'ABS', 'Proquest': 'ABSTRACT', 'PubMed': 'ab', 'EBSCO': 'AB'},
-'kf': {'WoS': 'KP', 'Scopus': 'KEY', 'Proquest': 'IF', 'PubMed': 'ot', 'EBSCO': 'SU'},
-'kw': {'WoS': 'KP', 'Scopus': 'KEY', 'Proquest': 'IF', 'PubMed': 'ot', 'EBSCO': 'SU'} 
-}
+'ti': {'WoS': 'TI', 'Cochrane':'ti', 'Scopus': 'TITLE', 'Proquest': 'TITLE', 'PubMed': 'ti', 'EBSCO': 'TI'},
+'m.titl': {'WoS': 'TI', 'Cochrane':'ti', 'Scopus': 'TITLE', 'Proquest': 'TITLE', 'PubMed': 'ti', 'EBSCO': 'TI'},
+'ab': {'Scopus': 'ABS', 'Cochrane':'ab', 'Proquest': 'ABSTRACT', 'PubMed': 'ab', 'EBSCO': 'AB'},
+'kf': {'WoS': 'KP', 'Scopus': 'KEY', 'Cochrane':'kw', 'Proquest': 'IF', 'PubMed': 'ot', 'EBSCO': 'SU'},
+'kw': {'WoS': 'KP', 'Scopus': 'KEY', 'Cochrane':'kw', 'Proquest': 'IF', 'PubMed': 'ot', 'EBSCO': 'SU'}}
 
 field_combine_functions = {
     'Proquest': lambda fields, condition : ','.join(fields) + '(' + condition + ')',
