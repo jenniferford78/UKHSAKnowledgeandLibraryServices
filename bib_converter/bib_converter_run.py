@@ -256,7 +256,7 @@ class Phrase:
         else:
             cleaned_input = cleaned_input[:result_count_match.start()].strip()
         print(cleaned_input)
-        if re.match(r'\d+', cleaned_input):
+        if re.match(r'\d+(and|or|[\d /\(\)])+$', cleaned_input):
             self.type = 'combinednumberedqueries'
             self.text = cleaned_input
         elif re.match(r'(and|or)/', cleaned_input):
@@ -352,5 +352,7 @@ FieldSearchCondition('"air condi?ioning* and mushrooms"').export('EBSCO')
 Phrase('bacon and eggs').export('EBSCO')
 Phrase('"bacon and eggs"').export('EBSCO')
 Phrase('"bacon sandwich" and "poached eggs"').export('EBSCO')
+Phrase('3     37 weeks.tw,kw,kf. (11948)').export('WoS')
+Phrase('1 December 2021').export('Proquest')
 
 """
