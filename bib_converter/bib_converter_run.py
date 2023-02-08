@@ -30,7 +30,7 @@ field_combine_functions = {
     'Scopus': lambda fields, condition : '-'.join(fields) + '(' + condition + ')',
     'WoS' : lambda fields, condition: ' OR '.join([field + '=(' + condition + ')' for field in fields]),
     'Cochrane' : lambda fields, condition: condition + ':' + ','.join(fields),
-    'EBSCO': lambda fields, condition : ','.join(fields) + condition,
+    'EBSCO': lambda fields, condition : ','.join(fields) + ' (' + condition + ')',
     'PubMed' : lambda fields, condition: ' OR '.join([condition + '[' + field + ']' for field in fields])
 }
 
@@ -55,7 +55,7 @@ mandatories = {'EBSCO': '?', 'Cochrane': '?', #Warning for Cochrane
                 'WoS': '?', 'Scopus': '?', 'Proquest': '?' }
 
 
-operator_regex = r'[^"]*(?:[^"]*["][^"]*["][^"]*)*\s(and|or|adj\d+)\s' #Operator must be preceded by an even number of quotes
+operator_regex = r'[^"]*?(?:[^"]*["][^"]*["][^"]*)*?\s(and|or|adj\d+)\s' #Operator must be preceded by an even number of quotes
 # Use re.match instead of re.search to force starting at the start of the string
 
 
@@ -354,5 +354,20 @@ Phrase('"bacon and eggs"').export('EBSCO')
 Phrase('"bacon sandwich" and "poached eggs"').export('EBSCO')
 Phrase('3     37 weeks.tw,kw,kf. (11948)').export('WoS')
 Phrase('1 December 2021').export('Proquest')
+Phrase('10     impetigo.tw,kf. (1785)').export('EBSCO')
+Phrase('7     (GAS adj5 (invasive or bacter* or infect*)).tw,kf. (3828)').export('EBSCO')
+"""
 
+# Debugging
+
+"""
+import traceback 
+try:
+    x = Phrase('7     (GAS adj5 (invasive or bacter* or infect*)).tw,kf. (3828)')
+except Exception:
+    print('Here is the issue:')
+    print(traceback.format_exc())
+from traceback_with_variables import activate_by_import
+x = Phrase('7     (GAS adj5 (invasive or bacter* or infect*)).tw,kf. (3828)')
+x.export('EBSCO')
 """
